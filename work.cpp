@@ -2,6 +2,8 @@
 #include <unistd.h>
 #include <sys/uio.h>
 #include <sys/socket.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 ssize_t
 sock_fd_write(int sock, void *buf, ssize_t buflen, int fd)
@@ -114,7 +116,7 @@ child(int sock)
     size = sock_fd_read(sock, buf, sizeof(buf), &fd);
     if (size <= 0)
       break;
-    printf ("read %d\n", size);
+    printf ("read %d\n", (int) size);
     if (fd != -1) {
       write(fd, "hello, world\n", 13);
       close(fd);
@@ -131,7 +133,7 @@ parent(int sock)
 
   fd = 1;
   size = sock_fd_write(sock, (void *) "1", 1, 1);
-  printf ("wrote %d\n", size);
+  printf ("wrote %d\n", (int) size);
 }
 
 int
@@ -140,7 +142,7 @@ main(int argc, char **argv)
   int sv[2];
   int pid;
 
-  if (socketpair(AF_LOCAL, SOCK_STREAM, 0, sv) < 0) {
+  if (socketpair(AF_UNIX, SOCK_DGRAM, 0, sv) < 0) {
     perror("socketpair");
     exit(1);
   }
